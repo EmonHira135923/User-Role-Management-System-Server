@@ -39,13 +39,6 @@ export const ValidateFields = async(req,res,next) => {
         })
     }
 
-    if(!image){
-        return res.status(400).json({
-            message:"Image Fields Are Required",
-            success:false
-        })
-    }
-
 
     next();
 }
