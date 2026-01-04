@@ -21,7 +21,7 @@ export const connectDB = async() => {
     try{
         await client.connect();
         db = client.db("User-Role-Management-System");
-        userCollection = client.db("users");
+        userCollection = db.collection("users");
         console.log("MongoDB Connection Successfully");
     }
     catch(err){

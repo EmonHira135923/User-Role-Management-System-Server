@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import projectStart from "../routes/projectStart.routes.js";
+import users from "../routes/users.routes.js";
 
 const app = express();
 
@@ -12,6 +13,9 @@ app.use(express.json());
 
 // Routes
 app.use("/",projectStart);
+
+// User Routes
+app.use("/api",users);
 
 
 export default app;
