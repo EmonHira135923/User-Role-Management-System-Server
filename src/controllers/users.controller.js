@@ -1,21 +1,33 @@
 import { getUsers } from "../config/db.js"
+import bcrypt from "bcrypt";
+import { createUser } from "../models/users.schema.js";
 
 // Create Users
 export const CreateUser = async(req,res) => {
     try{
         const userCollection = getUsers();
-        // console.log("UsersCollection",userCollection);
-        const query = req.body;
-        // console.log("Query",query);
+        const {name,email,password,phone,image} = req.body;
+        const hasedpassword = await bcrypt.hash(password,10);
+
+        const query = createUser({
+            name,
+            email,
+            password:hasedpassword,
+            phone,
+            image,
+            role:"user"
+        })
+
+
         const result = await userCollection.insertOne(query);
         res.status(201).json({
             message:"Users Created Successfully",
             success:true,
-            result:result.data
+            result:result
         });
     }
     catch(err){
-        res.status(404).json({
+        res.status(400).json({
             message:"Users Not Created yet.",
             success:false,
             err:err.message
@@ -32,6 +44,6 @@ export const GetUsers = async(req,res) => {
         res.status(200).send(result);
     }
     catch(err){
-        res.status(404).send(err.message);
+        res.status(400).send(err.message);
     }
 }
