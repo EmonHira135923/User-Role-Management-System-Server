@@ -16,7 +16,7 @@ export const LoginController = async(req,res) => {
         const user = await userCollection.findOne({email});
         if(!user){
             return res.status(401).json({
-                message:"UnAuthoraized!!! Please Registration",
+                message:"Invalid Crdiantials",
                 status:false
             })
         }
@@ -26,7 +26,7 @@ export const LoginController = async(req,res) => {
         // console.log("after password ",isMatchedPassword);
         if(!isMatchedPassword){
             return res.status(401).json({
-                message:"UnAuthoraized!!! Please Registration",
+                message:"Invalid Crdiantials",
                 status:false
             })
         }
@@ -87,7 +87,7 @@ export const LogoutController = async (req, res) => {
     // Clear the refresh token cookie
     res.clearCookie("refreshToken", {
       httpOnly: true,
-      secure: false, // HTTPS হলে true হবে
+      secure: false, 
       sameSite: "strict",
       path: "/",
     });
@@ -115,7 +115,7 @@ export const GetMyProfileController = async(req,res) => {
         const result = await userCollection.findOne(query);
         if(!result){
             return res.status(404).json({
-            message:"UnAuthoraized!!! Please Registration",
+            message:"Invalid Crdiantials",
             success:false
             })
         }
@@ -124,7 +124,7 @@ export const GetMyProfileController = async(req,res) => {
     }
     catch(err){
         res.status(400).json({
-            message:"Unauthoraized Person!!! Registration First",
+            message:"Invalid Crdiantials",
             success:false,
             err:err.message
         })

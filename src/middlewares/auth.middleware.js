@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken";
 export const VerifyToken = (req,res,next) => {
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ message: "Unauthorized Person",success:false });
-    console.log("token in middleware",token);
 
     // jwt verify
     jwt.verify(token,process.env.JWT_SECRET_KEY,(err,decoded)=>{
