@@ -43,6 +43,33 @@ export const ValidateFields = async(req,res,next) => {
     next();
 }
 
+export const ValidateLoginFields = async(req,res,next) => {
+    const userCollection = getUsers();
+    const {email,password} = req.body;
+    if(!email && !password){
+        return res.status(400).json({
+            message:"All Fields Are Required",
+            success:false,
+        })
+    }
+
+    if(!email){
+        return res.status(400).json({
+            message:"Email Fields Are Required",
+            success:false,
+        })
+    }
+
+    if(!password){
+        return res.status(400).json({
+            message:"All Fields Are Required",
+            success:false,
+        })
+    }
+
+    next();
+}
+
 
 export const CheckUniqueUser = async(req,res,next) => {
     const userCollection = getUsers();
