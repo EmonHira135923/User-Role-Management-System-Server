@@ -1,20 +1,17 @@
 import jwt from "jsonwebtoken";
 
 export const VerifyToken = (req,res,next) => {
-    const authoraization =  req.headers.authorization || null;
-    if(!authoraization){
-        res.status(400).json({
-            message: "Unauthoraized Person !!!! Please Registration",
-            success:false
-        })
-    }
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) return res.status(401).json({ message: "Unauthorized Person",success:false });
+    console.log("token in middleware",token);
 
-    const token = authoraization.split(" ")[1];
-    if(!token){
-        res.status(400).json({
-            message: "Unauthoraized Person !!!! Please Registration",
-            success:false
-        })
-    }
-    next();
+    // jwt verify
+    jwt.verify(token,process.env.JWT_SECRET_KEY,(err,decoded)=>{
+        if(err){
+            return res.status(403).json({ message: "Invalid Token",success:false }); 
+        }
+        req.user = decoded;
+        console.log("users",req.user)
+        next();
+    })
 }

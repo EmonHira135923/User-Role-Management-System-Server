@@ -85,20 +85,20 @@ export const LoginController = async(req,res) => {
 export const GetMyProfileController = async(req,res) => {
     try{
         const userCollection = getUsers();
-        const id = req.user_id;
+        const id = req.user._id;
         const query = {_id: new ObjectId(id)};
         const result = await userCollection.findOne(query);
         if(!result){
-            res.status(404).json({
+            return res.status(404).json({
             message:"UnAuthoraized!!! Please Registration",
             success:false
             })
         }
-        res.send(result);
+        res.status(200).json(result);
 
     }
     catch(err){
-        res.status.json({
+        res.status(400).json({
             message:"Unauthoraized Person!!! Registration First",
             success:false,
             err:err.message
