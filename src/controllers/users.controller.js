@@ -92,7 +92,7 @@ export const GetUsersByIdController = async(req,res) => {
 }
 
 // Update user and also image update also
-export const UpdateUserControllerbyId = async (req, res) => {
+export const UpdateUserControllerById = async (req, res) => {
     try {
         const userCollection = getUsers();
         const {email} = req.params;

@@ -81,6 +81,31 @@ export const LoginController = async(req,res) => {
     
 }
 
+// logout
+export const LogoutController = async (req, res) => {
+  try {
+    // Clear the refresh token cookie
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: false, // HTTPS হলে true হবে
+      sameSite: "strict",
+      path: "/",
+    });
+
+    res.status(200).json({
+      message: "Logout Successfully",
+      success: true,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Logout Failed",
+      success: false,
+      err: err.message,
+    });
+  }
+};
+
+
 // me
 export const GetMyProfileController = async(req,res) => {
     try{
@@ -105,4 +130,5 @@ export const GetMyProfileController = async(req,res) => {
         })
     }
 }
+
 
