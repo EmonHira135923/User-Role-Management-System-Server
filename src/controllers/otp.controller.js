@@ -1,4 +1,5 @@
 import {getOtp} from "../config/db.js";
+import bcrypt from "bcrypt";
 import transporter from "../config/mail.js";
 import generateOtp from "../utils/genarate.otp.js";
 import { renderTemplate } from "../utils/render.otp.templete.js";
@@ -35,9 +36,11 @@ export const sendOtpController = async (req, res) => {
 
     const otp = generateOtp();
 
+    const hashedOtp = await bcrypt.hash(otp,10);
+
     await otpCollection.insertOne({
       email,
-      otp,
+      otp:hashedOtp,
       expiresAt: new Date(Date.now() + OTP_VALIDITY_MS),
       createdAt: new Date(),
     });
@@ -71,5 +74,58 @@ export const sendOtpController = async (req, res) => {
 
 
 export const verifyOtpController = async(req,res) => {
-    res.send("Verify");
+    try {
+    const { email, otp } = req.body;
+    if (!email || !otp) {
+      return res.status(400).json({ message: "Email and OTP required" });
+    }
+
+    const otpCollection = getOtp();
+    const otpDoc = await otpCollection.findOne({ email });
+
+    if (!otpDoc) {
+      return res.status(400).json({ message: "OTP not found or expired" });
+    }
+
+    // Check if OTP is expired
+    if (otpDoc.expiresAt < new Date()) {
+      await otpCollection.deleteOne({ email });
+      return res.status(400).json({ message: "OTP expired" });
+    }
+
+    // Verify OTP
+    const isMatch = await bcrypt.compare(otp, otpDoc.otp);
+    if (!isMatch) {
+      // Optional: Track failed attempts
+      const failedAttempts = (otpDoc.failedAttempts || 0) + 1;
+      if (failedAttempts >= 3) {
+        await otpCollection.deleteOne({ email });
+        return res.status(400).json({ 
+          message: "Too many failed attempts. OTP has been invalidated." 
+        });
+      }
+      
+      await otpCollection.updateOne(
+        { email },
+        { $set: { failedAttempts } }
+      );
+      
+      return res.status(400).json({ 
+        message: "Invalid OTP",
+        remainingAttempts: 3 - failedAttempts
+      });
+    }
+
+    // Delete OTP after successful verification
+    await otpCollection.deleteOne({ email });
+
+    res.json({ 
+      success: true, 
+      message: "OTP verified successfully",
+      verifiedAt: new Date()
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "OTP verification failed" });
+  }
 }
