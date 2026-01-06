@@ -62,7 +62,7 @@ export const LoginController = async(req,res) => {
             path:"/"
         })
 
-        console.log("all data",)
+        // console.log("all data",)
 
 
 

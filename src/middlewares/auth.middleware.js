@@ -10,7 +10,7 @@ export const VerifyToken = (req,res,next) => {
             return res.status(403).json({ message: "Invalid Token",success:false }); 
         }
         req.user = decoded;
-        console.log("users",req.user)
+        // console.log("users",req.user)
         next();
     })
 }

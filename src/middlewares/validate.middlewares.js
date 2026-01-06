@@ -46,7 +46,7 @@ export const ValidateFields = async(req,res,next) => {
 export const ValidateLoginFields = async(req,res,next) => {
     const userCollection = getUsers();
     const {email,password} = req.body;
-    console.log(email,password)
+    // console.log(email,password)
     if(!email && !password){
         return res.status(400).json({
             message:"All Fields Are Required",
