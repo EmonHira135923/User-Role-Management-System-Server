@@ -15,13 +15,15 @@ const client = new MongoClient(uri, {
 });
 
 let db;
-let userCollection
+let userCollection;
+let otpCollection;
 
 export const connectDB = async() => {
     try{
         // await client.connect();
         db = client.db("User-Role-Management-System");
         userCollection = db.collection("users");
+        otpCollection=db.collection("otp");
         console.log("MongoDB Connection Successfully");
     }
     catch(err){
@@ -32,3 +34,4 @@ export const connectDB = async() => {
 
 export const getDB = () => db;
 export const getUsers = () => userCollection;
+export const getOtp = () => otpCollection;
