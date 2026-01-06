@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import projectStart from "../routes/projectStart.routes.js";
 import users from "../routes/users.routes.js";
 import auth from "../routes/auth.routes.js";
+import otp from "../routes/otp.routes.js";
 
 const app = express();
 
@@ -21,7 +22,10 @@ app.use("/",projectStart);
 app.use("/api",users);
 
 // Auth Routes
-app.use("/api",auth)
+app.use("/api",auth);
+
+// Otp Routes
+app.use("/api",otp);
 
 
 export default app;
