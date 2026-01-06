@@ -175,3 +175,135 @@ export const DeleteUserController = async(req,res) => {
     }
 
 };
+
+
+
+// Admin Access
+
+export const GetAllUsers = async (req, res) => {
+  try {
+    const userCollection = getUsers();
+    const users = await userCollection.find().toArray();
+    res.status(200).json(users);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch users", err });
+  }
+};
+
+
+// Admin Can Show User
+export const GetSingleUserbyAdmin = async(req,res)=>{
+    try{
+            const userCollection = getUsers();
+    const {email} = req.params;
+    const query = {email};
+    // admin
+    if (req.user.email === email) {
+      return res.status(403).json({ message: "Cannot fetch your own admin data here" });
+    }
+    const result = await userCollection.findOne(query);
+    if(!result){
+        return res.status(400).json({
+            message:"User not Found",
+            success:false,
+            result
+        })
+    }
+    res.status(200).json({
+        result
+    })
+    }
+    catch(err){
+        res.status(400).json({
+            message: "Users Not Find",
+            success:false,
+            err:err.message
+        })
+    }
+}
+
+// Admin Can Update User
+export const UpdateUserByAdmin = async(req,res)=>{
+    try {
+        const userCollection = getUsers();
+        const {email} = req.params;
+        const {phone} = req.body;
+        const query = {email};
+
+        const oldUser = await userCollection.findOne(query);
+
+        let image = null;
+
+        if (req.file) {
+
+        if (oldUser?.image?.public_id) {
+        await cloudinary.uploader.destroy(oldUser.image.public_id);
+        }
+
+        const imgResult = await cloudinary.uploader.upload(req.file.path, {
+            folder: "users"
+        });
+
+        image = {
+            url: imgResult.secure_url,
+            public_id: imgResult.public_id
+        };
+        }
+
+        const updatedata = {
+            $set:{
+                phone,
+                image,
+                updatedAt: new Date()
+            }
+        }
+
+        const option = {};
+
+        const result = await userCollection.updateOne(query,updatedata,option);
+
+        res.status(200).json({
+            message: "Updated successfully",
+            success: true,
+            result
+        });
+
+    }
+    catch(err){
+        res.status(500).json({
+            message:"Server Error",
+            success:false,
+            err:err.message,
+            
+        })
+    }
+}
+
+// Admin Can Delete User
+export const DeleteUserByAdmin = async (req, res) => {
+  try {
+    const userCollection =getUsers();
+    const { email } = req.params;
+
+    // email === admin !== not deleted
+    if (req.user.email === email) {
+      return res.status(403).json({ message: "Admin cannot delete their own account" });
+    }
+
+    // STEP 1: user খুঁজে বের করা
+    const user = await userCollection.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // STEP 2: যদি image থাকে → cloudinary থেকে delete
+    if (user?.image?.public_id) {
+      await cloudinary.uploader.destroy(user.image.public_id);
+    }
+
+    // STEP 3: ডাটাবেস থেকে user delete করা
+    const result = await userCollection.deleteOne({ email });
+
+    res.status(200).json({ message: "User deleted successfully", result });
+  } catch (err) {
+    res.status(500).json({ message: "Delete failed", err });
+  }
+};
