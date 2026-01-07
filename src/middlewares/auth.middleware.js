@@ -20,3 +20,10 @@ export const verifyAdmin = (req, res, next) => {
     if (req.user.role !== "admin") return res.status(403).json({ message: "Admins only" });
     next();
 };
+
+export const verifyUser = (req, res, next) => {
+  if (req.user.role !== "user") {
+    return res.status(403).json({ message: "User access only" });
+  }
+  next();
+};
